@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Inventario y Ventas - Vasos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better visual feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: #fff;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-indigo-700 text-white shadow-md no-print sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-indigo-600 rounded-xl shadow-inner">
+                    <i data-lucide="cup-soda" class="w-6 h-6 text-indigo-200"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Control de Inventario y Ventas</h1>
+                    <p class="text-xs text-indigo-200">Gestión Diaria de Vasos y Promociones</p>
+                </div>
+            </div>
+
+            <!-- Tasa BCV Widget -->
+            <div class="flex items-center bg-indigo-800/80 rounded-xl p-1.5 px-3 border border-indigo-500/40 shadow-inner">
+                <div class="flex items-center space-x-2 mr-3">
+                    <span class="inline-flex items-center justify-center w-7 h-7 bg-amber-500 text-white rounded-lg font-bold text-xs shadow-sm">
+                        BCV
+                    </span>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-indigo-200 uppercase font-semibold">Tasa del Día</span>
+                        <span class="text-xs font-medium text-amber-300" id="bcvDisplay">884.75 Bs/$</span>
+                    </div>
+                </div>
+                <button onclick="openBcvModal()" class="p-1.5 hover:bg-indigo-600 rounded-lg text-indigo-200 hover:text-white transition" title="Editar Tasa BCV">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- DASHBOARD METRICS -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Ventas USD & VES -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ventas Totales</p>
+                        <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="metricTotalUsd">$0.00</h3>
+                    </div>
+                    <div class="p-2.5 bg-emerald-50 rounded-xl text-emerald-600">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-medium">Equivalente BCV:</span>
+                    <span class="font-bold text-emerald-700" id="metricTotalBs">0.00 Bs</span>
+                </div>
+            </div>
+
+            <!-- Costo Vasos Gastados -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Costo de Vasos Gastados</p>
+                        <h3 class="text-2xl font-extrabold text-amber-600 mt-1" id="metricCostUsd">$0.00</h3>
+                    </div>
+                    <div class="p-2.5 bg-amber-50 rounded-xl text-amber-600">
+                        <i data-lucide="package-minus" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-medium">Equivalente BCV:</span>
+                    <span class="font-bold text-amber-700" id="metricCostBs">0.00 Bs</span>
+                </div>
+            </div>
+
+            <!-- Ganancia Bruta -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ganancia Neta Estimada</p>
+                        <h3 class="text-2xl font-extrabold text-indigo-600 mt-1" id="metricProfitUsd">$0.00</h3>
+                    </div>
+                    <div class="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
+                        <i data-lucide="trending-up" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-medium">Equivalente BCV:</span>
+                    <span class="font-bold text-indigo-700" id="metricProfitBs">0.00 Bs</span>
+                </div>
+            </div>
+
+            <!-- Vasos Totales Gastados -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Vasos Usados Hoy</p>
+                        <h3 class="text-2xl font-extrabold text-slate-800 mt-1" id="metricCupsUsed">0 <span class="text-sm font-normal text-slate-500">unid.</span></h3>
+                    </div>
+                    <div class="p-2.5 bg-blue-50 rounded-xl text-blue-600">
+                        <i data-lucide="cup-soda" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-medium">Total Ventas Registradas:</span>
+                    <span class="font-bold text-slate-700" id="metricSalesCount">0</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE ACCIONES RÁPIDAS: PROMOCIONES -->
+        <section class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-5 text-white shadow-md no-print">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                <div>
+                    <span class="inline-block px-2.5 py-0.5 bg-amber-700/50 text-amber-100 text-[10px] font-bold rounded-full uppercase tracking-wider mb-1">
+                        Acceso Rápido
+                    </span>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-amber-200"></i> Promociones Activas
+                    </h2>
+                </div>
+                <p class="text-xs text-amber-100 max-w-xs">Registra con 1 solo clic los combos especiales agregando 2 vasos al instante.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Promo 22oz -->
+                <div class="bg-white/10 hover:bg-white/20 transition backdrop-blur-sm rounded-xl p-4 border border-white/20 flex justify-between items-center">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-base">Extra Grandes 22oz</span>
+                            <span class="bg-amber-900/60 text-amber-200 text-xs px-2 py-0.5 rounded-md font-semibold">2 x $10.00</span>
+                        </div>
+                        <p class="text-xs text-amber-100 mt-1">Descuenta 2 vasos del inventario de 22oz.</p>
+                    </div>
+                    <button onclick="quickPromoSale('xl_22', 2, 10.00, 'Promo 2x $10')" class="px-4 py-2 bg-white text-amber-700 hover:bg-amber-50 font-bold rounded-xl shadow-sm hover:shadow transition text-xs flex items-center gap-1.5 active:scale-95">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Vender Combo
+                    </button>
+                </div>
+
+                <!-- Promo 32oz -->
+                <div class="bg-white/10 hover:bg-white/20 transition backdrop-blur-sm rounded-xl p-4 border border-white/20 flex justify-between items-center">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-base">Tinas 32oz</span>
+                            <span class="bg-amber-900/60 text-amber-200 text-xs px-2 py-0.5 rounded-md font-semibold">2 x $12.00</span>
+                        </div>
+                        <p class="text-xs text-amber-100 mt-1">Descuenta 2 vasos del inventario de 32oz.</p>
+                    </div>
+                    <button onclick="quickPromoSale('tina_32', 2, 12.00, 'Promo 2x $12')" class="px-4 py-2 bg-white text-amber-700 hover:bg-amber-50 font-bold rounded-xl shadow-sm hover:shadow transition text-xs flex items-center gap-1.5 active:scale-95">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Vender Combo
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN TWO COLUMN WORKSPACE -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- COLUMN LEFT: POS & INVENTORY CONTROL (5 Cols) -->
+            <div class="lg:col-span-5 space-y-6 no-print">
+
+                <!-- REGISTRO MANUAL DE VENTAS -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="shopping-cart" class="w-5 h-5 text-indigo-600"></i> Registrar Venta / Uso Diario
+                    </h2>
+
+                    <form id="saleForm" onsubmit="handleManualSale(event)" class="space-y-4">
+                        <!-- Selección Vaso -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Tamaño de Vaso</label>
+                            <select id="cupSelect" onchange="updateSaleFormOptions()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 p-2.5 transition">
+                                <option value="p_8">Pequeño 8oz ($1.75)</option>
+                                <option value="m_12">Mediano 12oz ($2.50)</option>
+                                <option value="g_16">Grande 16oz ($3.90)</option>
+                                <option value="xl_22">Extra Grande 22oz ($5.50)</option>
+                                <option value="tina_32">Tina 32oz ($6.90)</option>
+                            </select>
+                        </div>
+
+                        <!-- Modalidad (Normal vs Promo) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Modalidad de Venta</label>
+                            <div class="grid grid-cols-2 gap-2" id="modalityContainer">
+                                <button type="button" id="btnModeNormal" onclick="setSaleMode('normal')" class="py-2 px-3 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 flex items-center justify-center gap-1.5 transition">
+                                    <i data-lucide="user" class="w-3.5 h-3.5"></i> Individual
+                                </button>
+                                <button type="button" id="btnModePromo" onclick="setSaleMode('promo')" class="py-2 px-3 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center justify-center gap-1.5 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <i data-lucide="tag" class="w-3.5 h-3.5"></i> Promoción (2x)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cantidad de Transacciones -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">
+                                    <span id="qtyLabel">Cantidad de Vasos</span>
+                                </label>
+                                <div class="flex items-center">
+                                    <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-l-xl border border-r-0 border-slate-300 font-bold text-slate-600 text-lg flex items-center justify-center">-</button>
+                                    <input type="number" id="saleQty" min="1" value="1" class="w-full h-10 text-center border-t border-b border-slate-300 font-bold text-slate-800 text-sm focus:outline-none focus:ring-0">
+                                    <button type="button" onclick="adjustQty(1)" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-r-xl border border-l-0 border-slate-300 font-bold text-slate-600 text-lg flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Monto Calculado</label>
+                                <div class="h-10 bg-slate-100 border border-slate-200 rounded-xl px-3 flex items-center justify-between font-bold text-slate-800 text-sm">
+                                    <span id="calculatedUsd">$1.75</span>
+                                    <span id="calculatedBs" class="text-xs font-semibold text-slate-500">0 Bs</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 active:scale-98">
+                            <i data-lucide="plus-circle" class="w-5 h-5"></i> Registrar Venta / Descontar Stock
+                        </button>
+                    </form>
+                </div>
+
+                <!-- INVENTARIO Y STOCK ACTUAL -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="boxes" class="w-5 h-5 text-indigo-600"></i> Estado del Inventario
+                        </h2>
+                        <button onclick="openInventoryModal()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 hover:underline">
+                            <i data-lucide="settings" class="w-3.5 h-3.5"></i> Ajustar Stock / Costos
+                        </button>
+                    </div>
+
+                    <div class="space-y-3" id="inventoryList">
+                        <!-- Inventory Items inserted via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUMN RIGHT: DAILY TRANSACTIONS TABLE (7 Cols) -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col h-full">
+                    
+                    <!-- Table Header & Actions -->
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="list-checks" class="w-5 h-5 text-indigo-600"></i> Historial de Registros de Hoy
+                            </h2>
+                            <p class="text-xs text-slate-500">Transacciones y consumo de vasos del día actual.</p>
+                        </div>
+
+                        <div class="flex items-center gap-2 no-print">
+                            <button onclick="exportCSV()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition flex items-center gap-1">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> CSV
+                            </button>
+                            <button onclick="printReport()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition flex items-center gap-1">
+                                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+                            </button>
+                            <button onclick="confirmResetDay()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-xl border border-rose-200 transition flex items-center gap-1">
+                                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Cerrar Día
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Printable Header Details (hidden on screen) -->
+                    <div class="hidden print-only mb-4 p-4 border border-slate-300 rounded-lg">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-xl font-bold">Reporte Diario de Ventas e Inventario de Vasos</h1>
+                                <p class="text-sm text-slate-600" id="printDate"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-slate-500">Tasa BCV Aplicada:</p>
+                                <p class="text-base font-bold" id="printBcv"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="overflow-x-auto flex-grow">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                                    <th class="py-3 px-3">Hora</th>
+                                    <th class="py-3 px-3">Producto / Vaso</th>
+                                    <th class="py-3 px-3">Modalidad</th>
+                                    <th class="py-3 px-3 text-center">Cant.</th>
+                                    <th class="py-3 px-3 text-right">Total $</th>
+                                    <th class="py-3 px-3 text-right">Total Bs</th>
+                                    <th class="py-3 px-3 text-center no-print">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTableBody" class="divide-y divide-slate-100 text-xs">
+                                <!-- Dynamic Sales Rows -->
+                            </tbody>
+                        </table>
+
+                        <!-- Empty State -->
+                        <div id="emptySalesState" class="py-12 text-center text-slate-400 flex flex-col items-center">
+                            <i data-lucide="inbox" class="w-12 h-12 stroke-1 mb-2"></i>
+                            <p class="font-medium text-sm">No hay ventas registradas el día de hoy.</p>
+                            <p class="text-xs text-slate-400">Utiliza el panel lateral o las promociones rápidas para agregar ventas.</p>
+                        </div>
+                    </div>
+
+                    <!-- Table Summary Footer -->
+                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-wrap justify-between items-center text-xs text-slate-600">
+                        <span id="salesCountFooter">0 registros en total</span>
+                        <div class="flex items-center space-x-4 font-bold text-slate-800">
+                            <span>Total $ USD: <span id="footerUsd" class="text-emerald-600">$0.00</span></span>
+                            <span>Total Bs: <span id="footerBs" class="text-emerald-700">0.00 Bs</span></span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 no-print">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+            Control de Inventario y Ventas Diarias &copy; <span id="year"></span>. Sistema de Gestión Eficiente de Vasos.
+        </div>
+    </footer>
+
+    <!-- MODAL: EDIT BCV RATE -->
+    <div id="bcvModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 animate-in fade-in zoom-in duration-150">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="dollar-sign" class="w-5 h-5 text-amber-500"></i> Actualizar Tasa BCV
+                </h3>
+                <button onclick="closeBcvModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Ingresa la tasa oficial del día en Bolívares (VES) por cada Dólar (USD).</p>
+            
+            <div class="mb-5">
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tasa Oficial (Bs/USD)</label>
+                <input type="number" step="0.01" id="inputBcvRate" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-lg font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closeBcvModal()" class="w-1/2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+                <button onclick="saveBcvRate()" class="w-1/2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition">Guardar Tasa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT INVENTORY & COSTS -->
+    <div id="inventoryModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-5 h-5 text-indigo-600"></i> Ajustar Inventario y Costos
+                </h3>
+                <button onclick="closeInventoryModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">Actualiza el stock disponible o el costo estimado del vaso de insumo.</p>
+
+            <div class="space-y-4 mb-6" id="inventoryEditContainer">
+                <!-- Inputs generated dynamically via JS -->
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closeInventoryModal()" class="w-1/2 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+                <button onclick="saveInventoryChanges()" class="w-1/2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM NOTIFICATION SYSTEM -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-medium px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-200 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400" id="toastIcon"></i>
+        <span id="toastMsg">Mensaje de notificación</span>
+    </div>
+
+    <!-- APPLICATION LOGIC JS -->
+    <script>
+        // CONFIGURATION & INITIAL STATE
+        const DEFAULT_PRODUCTS = {
+            'p_8': { id: 'p_8', name: 'Pequeño 8oz', price: 1.75, cupCost: 0.15, stock: 100, promoAvailable: false },
+            'm_12': { id: 'm_12', name: 'Mediano 12oz', price: 2.50, cupCost: 0.20, stock: 100, promoAvailable: false },
+            'g_16': { id: 'g_16', name: 'Grande 16oz', price: 3.90, cupCost: 0.25, stock: 100, promoAvailable: false },
+            'xl_22': { id: 'xl_22', name: 'Extra Grande 22oz', price: 5.50, cupCost: 0.35, stock: 100, promoAvailable: true, promoText: '2 x $10.00', promoPrice: 10.00, promoQty: 2 },
+            'tina_32': { id: 'tina_32', name: 'Tina 32oz', price: 6.90, cupCost: 0.50, stock: 100, promoAvailable: true, promoText: '2 x $12.00', promoPrice: 12.00, promoQty: 2 }
+        };
+
+        let state = {
+            bcvRate: 884.75,
+            products: JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)),
+            sales: [],
+            currentMode: 'normal' // 'normal' or 'promo'
+        };
+
+        // INITIALIZATION
+        window.onload = function() {
+            loadFromLocalStorage();
+            document.getElementById('year').innerText = new Date().getFullYear();
+            updateSaleFormOptions();
+            renderDashboard();
+            renderInventoryList();
+            renderSalesTable();
+            lucide.createIcons();
+        };
+
+        // LOCALSTORAGE PERSISTENCE
+        function saveToLocalStorage() {
+            localStorage.setItem('cup_inventory_app_data', JSON.stringify({
+                bcvRate: state.bcvRate,
+                products: state.products,
+                sales: state.sales
+            }));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('cup_inventory_app_data');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.bcvRate = parsed.bcvRate || 884.75;
+                    state.products = parsed.products || JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                    state.sales = parsed.sales || [];
+                } catch (e) {
+                    console.error("Error loading local storage:", e);
+                }
+            }
+            document.getElementById('bcvDisplay').innerText = `${formatNum(state.bcvRate)} Bs/$`;
+        }
+
+        // FORMATTING HELPERS
+        function formatNum(num) {
+            return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num || 0);
+        }
+
+        function formatUsd(num) {
+            return '$' + (num || 0).toFixed(2);
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            toastIcon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle');
+            toastIcon.className = `w-4 h-4 ${isError ? 'text-rose-400' : 'text-emerald-400'}`;
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // BCV RATE MODAL LOGIC
+        function openBcvModal() {
+            document.getElementById('inputBcvRate').value = state.bcvRate;
+            document.getElementById('bcvModal').classList.remove('hidden');
+        }
+
+        function closeBcvModal() {
+            document.getElementById('bcvModal').classList.add('hidden');
+        }
+
+        function saveBcvRate() {
+            const val = parseFloat(document.getElementById('inputBcvRate').value);
+            if (val && val > 0) {
+                state.bcvRate = val;
+                document.getElementById('bcvDisplay').innerText = `${formatNum(state.bcvRate)} Bs/$`;
+                saveToLocalStorage();
+                renderDashboard();
+                renderSalesTable();
+                calculateFormPrice();
+                closeBcvModal();
+                showToast('Tasa BCV actualizada correctamente.');
+            } else {
+                showToast('Por favor ingrese una tasa válida.', true);
+            }
+        }
+
+        // FORM INTERACTION & CALCULATION LOGIC
+        function updateSaleFormOptions() {
+            const cupKey = document.getElementById('cupSelect').value;
+            const product = state.products[cupKey];
+            const promoBtn = document.getElementById('btnModePromo');
+
+            if (product.promoAvailable) {
+                promoBtn.disabled = false;
+                promoBtn.title = `Promoción: ${product.promoText}`;
+            } else {
+                promoBtn.disabled = true;
+                setSaleMode('normal');
+            }
+            calculateFormPrice();
+        }
+
+        function setSaleMode(mode) {
+            state.currentMode = mode;
+            const btnNormal = document.getElementById('btnModeNormal');
+            const btnPromo = document.getElementById('btnModePromo');
+            const qtyLabel = document.getElementById('qtyLabel');
+
+            if (mode === 'normal') {
+                btnNormal.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 flex items-center justify-center gap-1.5 transition";
+                btnPromo.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center justify-center gap-1.5 transition disabled:opacity-50 disabled:cursor-not-allowed";
+                qtyLabel.innerText = "Cantidad de Vasos";
+            } else {
+                btnPromo.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-amber-600 bg-amber-50 text-amber-700 flex items-center justify-center gap-1.5 transition";
+                btnNormal.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center justify-center gap-1.5 transition";
+                qtyLabel.innerText = "Cantidad de Combos (2x)";
+            }
+            calculateFormPrice();
+        }
+
+        function adjustQty(delta) {
+            const qtyInput = document.getElementById('saleQty');
+            let val = parseInt(qtyInput.value) || 1;
+            val = Math.max(1, val + delta);
+            qtyInput.value = val;
+            calculateFormPrice();
+        }
+
+        document.getElementById('saleQty').addEventListener('input', calculateFormPrice);
+
+        function calculateFormPrice() {
+            const cupKey = document.getElementById('cupSelect').value;
+            const qty = parseInt(document.getElementById('saleQty').value) || 1;
+            const product = state.products[cupKey];
+
+            let unitPrice = product.price;
+            let totalPriceUsd = 0;
+
+            if (state.currentMode === 'promo' && product.promoAvailable) {
+                totalPriceUsd = qty * product.promoPrice;
+            } else {
+                totalPriceUsd = qty * unitPrice;
+            }
+
+            const totalPriceBs = totalPriceUsd * state.bcvRate;
+
+            document.getElementById('calculatedUsd').innerText = formatUsd(totalPriceUsd);
+            document.getElementById('calculatedBs').innerText = `${formatNum(totalPriceBs)} Bs`;
+        }
+
+        // SALES PROCESSORS
+        function handleManualSale(event) {
+            event.preventDefault();
+            const cupKey = document.getElementById('cupSelect').value;
+            const qtyMultiplier = parseInt(document.getElementById('saleQty').value) || 1;
+            const product = state.products[cupKey];
+
+            let cupsUsed = 0;
+            let totalUsd = 0;
+            let modeName = '';
+
+            if (state.currentMode === 'promo' && product.promoAvailable) {
+                cupsUsed = qtyMultiplier * product.promoQty;
+                totalUsd = qtyMultiplier * product.promoPrice;
+                modeName = `Promoción (${product.promoText})`;
+            } else {
+                cupsUsed = qtyMultiplier;
+                totalUsd = qtyMultiplier * product.price;
+                modeName = 'Individual';
+            }
+
+            // Check stock
+            if (product.stock < cupsUsed) {
+                showToast(`Stock insuficiente de ${product.name}. Disponibles: ${product.stock}`, true);
+                return;
+            }
+
+            executeSale(cupKey, cupsUsed, totalUsd, modeName);
+
+            // Reset Form Qty
+            document.getElementById('saleQty').value = 1;
+            calculateFormPrice();
+        }
+
+        function quickPromoSale(cupKey, cupsQty, priceUsd, modeName) {
+            const product = state.products[cupKey];
+            if (product.stock < cupsQty) {
+                showToast(`Stock insuficiente de ${product.name} para la promoción.`, true);
+                return;
+            }
+
+            executeSale(cupKey, cupsQty, priceUsd, modeName);
+        }
+
+        function executeSale(cupKey, cupsUsed, totalUsd, modeName) {
+            const product = state.products[cupKey];
+            
+            // Deduct stock
+            product.stock -= cupsUsed;
+
+            // Calculate cost of cups used
+            const totalCupCost = cupsUsed * product.cupCost;
+
+            const newSale = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                cupKey: cupKey,
+                productName: product.name,
+                cupsUsed: cupsUsed,
+                mode: modeName,
+                totalUsd: totalUsd,
+                cupCostUsd: totalCupCost,
+                bcvRateAtSale: state.bcvRate
+            };
+
+            state.sales.unshift(newSale); // Newest first
+
+            saveToLocalStorage();
+            renderDashboard();
+            renderInventoryList();
+            renderSalesTable();
+
+            showToast(`Venta de ${product.name} registrada (-${cupsUsed} vasos).`);
+        }
+
+        function deleteSale(saleId) {
+            const saleIndex = state.sales.findIndex(s => s.id === saleId);
+            if (saleIndex > -1) {
+                const sale = state.sales[saleIndex];
+                
+                // Return stock back
+                if (state.products[sale.cupKey]) {
+                    state.products[sale.cupKey].stock += sale.cupsUsed;
+                }
+
+                state.sales.splice(saleIndex, 1);
+                saveToLocalStorage();
+                renderDashboard();
+                renderInventoryList();
+                renderSalesTable();
+
+                showToast('Transacción revertida e inventario restaurado.');
+            }
+        }
+
+        // DASHBOARD RENDERER
+        function renderDashboard() {
+            let totalUsd = 0;
+            let totalCostUsd = 0;
+            let totalCups = 0;
+
+            state.sales.forEach(s => {
+                totalUsd += s.totalUsd;
+                totalCostUsd += s.cupCostUsd;
+                totalCups += s.cupsUsed;
+            });
+
+            const netProfitUsd = totalUsd - totalCostUsd;
+
+            // USD Values
+            document.getElementById('metricTotalUsd').innerText = formatUsd(totalUsd);
+            document.getElementById('metricCostUsd').innerText = formatUsd(totalCostUsd);
+            document.getElementById('metricProfitUsd').innerText = formatUsd(netProfitUsd);
+            document.getElementById('metricCupsUsed').innerHTML = `${totalCups} <span class="text-sm font-normal text-slate-500">unid.</span>`;
+            document.getElementById('metricSalesCount').innerText = state.sales.length;
+
+            // VES Values
+            document.getElementById('metricTotalBs').innerText = `${formatNum(totalUsd * state.bcvRate)} Bs`;
+            document.getElementById('metricCostBs').innerText = `${formatNum(totalCostUsd * state.bcvRate)} Bs`;
+            document.getElementById('metricProfitBs').innerText = `${formatNum(netProfitUsd * state.bcvRate)} Bs`;
+        }
+
+        // INVENTORY LIST RENDERER
+        function renderInventoryList() {
+            const container = document.getElementById('inventoryList');
+            container.innerHTML = '';
+
+            Object.values(state.products).forEach(p => {
+                const isLow = p.stock <= 15;
+                const percent = Math.min(100, Math.max(0, (p.stock / 100) * 100)); // Visual representation assuming 100 capacity base
+
+                const itemHtml = `
+                    <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-800">${p.name}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-500">Costo U: <b>${formatUsd(p.cupCost)}</b></span>
+                                <span class="px-2 py-0.5 font-bold rounded-md ${isLow ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">
+                                    Stock: ${p.stock}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                            <div class="${isLow ? 'bg-rose-500' : 'bg-indigo-600'} h-1.5 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHtml;
+            });
+        }
+
+        // SALES TABLE RENDERER
+        function renderSalesTable() {
+            const tbody = document.getElementById('salesTableBody');
+            const emptyState = document.getElementById('emptySalesState');
+            tbody.innerHTML = '';
+
+            if (state.sales.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            let footerUsdTotal = 0;
+            let footerBsTotal = 0;
+
+            state.sales.forEach(s => {
+                const totalBs = s.totalUsd * state.bcvRate;
+                footerUsdTotal += s.totalUsd;
+                footerBsTotal += totalBs;
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition";
+                row.innerHTML = `
+                    <td class="py-2.5 px-3 font-mono text-slate-500">${s.timestamp}</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800">${s.productName}</td>
+                    <td class="py-2.5 px-3">
+                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${s.mode.includes('Promo') ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}">
+                            ${s.mode}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-bold text-slate-700">${s.cupsUsed}</td>
+                    <td class="py-2.5 px-3 text-right font-bold text-slate-900">${formatUsd(s.totalUsd)}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold text-emerald-700">${formatNum(totalBs)} Bs</td>
+                    <td class="py-2.5 px-3 text-center no-print">
+                        <button onclick="deleteSale(${s.id})" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="Eliminar / Revertir Venta">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('salesCountFooter').innerText = `${state.sales.length} transacción(es) realizada(s)`;
+            document.getElementById('footerUsd').innerText = formatUsd(footerUsdTotal);
+            document.getElementById('footerBs').innerText = `${formatNum(footerBsTotal)} Bs`;
+
+            lucide.createIcons();
+        }
+
+        // INVENTORY ADJUSTMENT MODAL
+        function openInventoryModal() {
+            const container = document.getElementById('inventoryEditContainer');
+            container.innerHTML = '';
+
+            Object.values(state.products).forEach(p => {
+                const html = `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-12 gap-2 items-center">
+                        <div class="col-span-5">
+                            <span class="text-xs font-bold text-slate-800 block">${p.name}</span>
+                            <span class="text-[10px] text-slate-400">Precio Venta: ${formatUsd(p.price)}</span>
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[10px] font-semibold text-slate-500 uppercase block">Stock</label>
+                            <input type="number" id="edit_stock_${p.id}" value="${p.stock}" min="0" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="text-[10px] font-semibold text-slate-500 uppercase block">Costo Vaso ($)</label>
+                            <input type="number" step="0.01" id="edit_cost_${p.id}" value="${p.cupCost}" min="0" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            document.getElementById('inventoryModal').classList.remove('hidden');
+        }
+
+        function closeInventoryModal() {
+            document.getElementById('inventoryModal').classList.add('hidden');
+        }
+
+        function saveInventoryChanges() {
+            Object.keys(state.products).forEach(id => {
+                const newStock = parseInt(document.getElementById(`edit_stock_${id}`).value);
+                const newCost = parseFloat(document.getElementById(`edit_cost_${id}`).value);
+
+                if (!isNaN(newStock) && newStock >= 0) state.products[id].stock = newStock;
+                if (!isNaN(newCost) && newCost >= 0) state.products[id].cupCost = newCost;
+            });
+
+            saveToLocalStorage();
+            renderInventoryList();
+            renderDashboard();
+            closeInventoryModal();
+            showToast('Inventario y costos actualizados con éxito.');
+        }
+
+        // RESET DAY ACTION
+        function confirmResetDay() {
+            if (confirm('¿Estás seguro de cerrar el día? Se reiniciará el historial de ventas registradas hoy. (El inventario actual se mantendrá).')) {
+                state.sales = [];
+                saveToLocalStorage();
+                renderDashboard();
+                renderSalesTable();
+                showToast('Día cerrado. Registro de ventas reiniciado.');
+            }
+        }
+
+        // EXPORT TO CSV
+        function exportCSV() {
+            if (state.sales.length === 0) {
+                showToast('No hay datos de ventas para exportar.', true);
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Hora,Producto,Modalidad,Vasos Usados,Total USD,Tasa BCV,Total Bs\n";
+
+            state.sales.forEach(s => {
+                const totalBs = (s.totalUsd * state.bcvRate).toFixed(2);
+                csvContent += `"${s.timestamp}","${s.productName}","${s.mode}",${s.cupsUsed},${s.totalUsd.toFixed(2)},${state.bcvRate},${totalBs}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `reporte_ventas_vasos_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // PRINT REPORT
+        function printReport() {
+            document.getElementById('printDate').innerText = `Fecha de emisión: ${new Date().toLocaleDateString('es-VE')} - ${new Date().toLocaleTimeString()}`;
+            document.getElementById('printBcv').innerText = `${formatNum(state.bcvRate)} Bs/USD`;
+            window.print();
+        }
+    </script>
+</body>
+</html>
