@@ -11,34 +11,15 @@
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         @media print {
-            .no-print {
-                display: none !important;
-            }
-            .print-only {
-                display: block !important;
-            }
-            body {
-                background: #fff;
-                color: #000;
-            }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: #fff; color: #000; }
         }
     </style>
 </head>
@@ -53,7 +34,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">Control de Inventario y Ventas</h1>
-                    <p class="text-xs text-indigo-200">Gestión Diaria de Vasos y Promociones (Cloud Sync)</p>
+                    <p class="text-xs text-indigo-200">Gestión Diaria de Vasos, Toppings y Cloud Sync</p>
                 </div>
             </div>
 
@@ -84,7 +65,7 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ventas Totales</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ventas Brutas</p>
                         <h3 class="text-2xl font-extrabold text-slate-900 mt-1" id="metricTotalUsd">$0.00</h3>
                     </div>
                     <div class="p-2.5 bg-emerald-50 rounded-xl text-emerald-600">
@@ -97,11 +78,28 @@
                 </div>
             </div>
 
+            <!-- Menos 16% y Total Neto -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total menos 16%</p>
+                        <h3 class="text-2xl font-extrabold text-indigo-600 mt-1" id="metricNetLess16">$0.00</h3>
+                    </div>
+                    <div class="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
+                        <i data-lucide="percent" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-medium">16% Aplicado:</span>
+                    <span class="font-bold text-rose-600" id="metric16Value">-$0.00</span>
+                </div>
+            </div>
+
             <!-- Costo Vasos Gastados -->
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Costo de Vasos Gastados</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Costo de Vasos</p>
                         <h3 class="text-2xl font-extrabold text-amber-600 mt-1" id="metricCostUsd">$0.00</h3>
                     </div>
                     <div class="p-2.5 bg-amber-50 rounded-xl text-amber-600">
@@ -109,25 +107,8 @@
                     </div>
                 </div>
                 <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
-                    <span class="text-slate-500 font-medium">Equivalente BCV:</span>
-                    <span class="font-bold text-amber-700" id="metricCostBs">0.00 Bs</span>
-                </div>
-            </div>
-
-            <!-- Ganancia Bruta -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Ganancia Neta Estimada</p>
-                        <h3 class="text-2xl font-extrabold text-indigo-600 mt-1" id="metricProfitUsd">$0.00</h3>
-                    </div>
-                    <div class="p-2.5 bg-indigo-50 rounded-xl text-indigo-600">
-                        <i data-lucide="trending-up" class="w-5 h-5"></i>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
-                    <span class="text-slate-500 font-medium">Equivalente BCV:</span>
-                    <span class="font-bold text-indigo-700" id="metricProfitBs">0.00 Bs</span>
+                    <span class="text-slate-500 font-medium">Ganancia Neta Est.:</span>
+                    <span class="font-bold text-indigo-700" id="metricProfitUsd">$0.00</span>
                 </div>
             </div>
 
@@ -135,7 +116,7 @@
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Vasos Usados Hoy</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Vasos Usados</p>
                         <h3 class="text-2xl font-extrabold text-slate-800 mt-1" id="metricCupsUsed">0 <span class="text-sm font-normal text-slate-500">unid.</span></h3>
                     </div>
                     <div class="p-2.5 bg-blue-50 rounded-xl text-blue-600">
@@ -143,9 +124,19 @@
                     </div>
                 </div>
                 <div class="mt-3 pt-2 border-t border-slate-100 flex justify-between items-center text-xs">
-                    <span class="text-slate-500 font-medium">Total Ventas Registradas:</span>
+                    <span class="text-slate-500 font-medium">Transacciones:</span>
                     <span class="font-bold text-slate-700" id="metricSalesCount">0</span>
                 </div>
+            </div>
+        </section>
+
+        <!-- DESGLOSE DE USADOS POR TAMAÑO -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 no-print">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-600"></i> Desglose de Vasos Usados Hoy
+            </h3>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="breakdownContainer">
+                <!-- Generado por JS -->
             </div>
         </section>
 
@@ -232,6 +223,34 @@
                             </div>
                         </div>
 
+                        <!-- Añadir Toppings -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between">
+                            <div>
+                                <label class="text-xs font-bold text-slate-700 block">¿Incluye Topping?</label>
+                                <span class="text-[10px] text-slate-500" id="toppingPriceLabel">Costo: $0.50 c/u</span>
+                            </div>
+                            <input type="checkbox" id="includeTopping" onchange="calculateFormPrice()" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-slate-300">
+                        </div>
+
+                        <!-- Cortesía / Regalado -->
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 flex items-center justify-between">
+                            <div>
+                                <label class="text-xs font-bold text-amber-800 block">¿Es Cortesía / Regalado?</label>
+                                <span class="text-[10px] text-amber-600">Descuenta stock pero no suma monto total.</span>
+                            </div>
+                            <input type="checkbox" id="isCourtesy" onchange="calculateFormPrice()" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500 border-amber-300">
+                        </div>
+
+                        <!-- Método de Pago -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1.5">Método de Pago</label>
+                            <select id="paymentMethod" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 p-2.5 transition">
+                                <option value="Pago Móvil">Pago Móvil</option>
+                                <option value="Punto de Venta">Punto de Venta</option>
+                                <option value="Efectivo">Efectivo</option>
+                            </select>
+                        </div>
+
                         <!-- Cantidad de Transacciones -->
                         <div class="grid grid-cols-2 gap-3">
                             <div>
@@ -267,7 +286,7 @@
                             <i data-lucide="boxes" class="w-5 h-5 text-indigo-600"></i> Estado del Inventario
                         </h2>
                         <button onclick="openInventoryModal()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 hover:underline">
-                            <i data-lucide="settings" class="w-3.5 h-3.5"></i> Ajustar Stock / Costos
+                            <i data-lucide="settings" class="w-3.5 h-3.5"></i> Ajustar Stock / Costos / Toppings
                         </button>
                     </div>
 
@@ -288,7 +307,7 @@
                             <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
                                 <i data-lucide="list-checks" class="w-5 h-5 text-indigo-600"></i> Historial de Registros de Hoy
                             </h2>
-                            <p class="text-xs text-slate-500">Transacciones y consumo de vasos sincronizados en la nube.</p>
+                            <p class="text-xs text-slate-500">Transacciones, consumos y métodos de pago sincronizados.</p>
                         </div>
 
                         <div class="flex items-center gap-2 no-print">
@@ -324,8 +343,8 @@
                             <thead>
                                 <tr class="border-b border-slate-200 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
                                     <th class="py-3 px-3">Hora</th>
-                                    <th class="py-3 px-3">Producto / Vaso</th>
-                                    <th class="py-3 px-3">Modalidad</th>
+                                    <th class="py-3 px-3">Producto / Detalles</th>
+                                    <th class="py-3 px-3">Pago</th>
                                     <th class="py-3 px-3 text-center">Cant.</th>
                                     <th class="py-3 px-3 text-right">Total $</th>
                                     <th class="py-3 px-3 text-right">Total Bs</th>
@@ -391,16 +410,21 @@
         </div>
     </div>
 
-    <!-- MODAL: EDIT INVENTORY & COSTS -->
+    <!-- MODAL: EDIT INVENTORY, COSTS & TOPPING -->
     <div id="inventoryModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-5 h-5 text-indigo-600"></i> Ajustar Inventario y Costos
+                    <i data-lucide="sliders" class="w-5 h-5 text-indigo-600"></i> Ajustar Inventario, Costos y Toppings
                 </h3>
                 <button onclick="closeInventoryModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <p class="text-xs text-slate-500 mb-4">Actualiza el stock disponible o el costo estimado del vaso de insumo.</p>
+            <p class="text-xs text-slate-500 mb-4">Actualiza el stock, costos o el precio individual del topping.</p>
+
+            <div class="mb-4 p-3 bg-indigo-50 rounded-xl border border-indigo-200">
+                <label class="text-xs font-bold text-indigo-900 block mb-1">Costo Editable del Topping ($)</label>
+                <input type="number" step="0.01" id="editToppingPrice" min="0" class="w-full bg-white border border-indigo-300 rounded-lg p-2 text-xs font-bold text-slate-800">
+            </div>
 
             <div class="space-y-4 mb-6" id="inventoryEditContainer">
                 <!-- Inputs generated dynamically via JS -->
@@ -447,441 +471,16 @@
 
         let state = {
             bcvRate: 36.50,
+            toppingPrice: 0.50,
             products: JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)),
             sales: [],
             currentMode: 'normal'
         };
 
-        // INITIALIZATION & REAL-TIME LISTENER
         window.onload = function() {
             document.getElementById('year').innerText = new Date().getFullYear();
 
-            // Escuchar cambios en tiempo real desde Firebase Firestore
             onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     state.bcvRate = data.bcvRate || 36.50;
-                    state.products = data.products || JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-                    state.sales = data.sales || [];
-                } else {
-                    syncToFirebase();
-                }
-                document.getElementById('bcvDisplay').innerText = `${formatNum(state.bcvRate)} Bs/$`;
-                updateSaleFormOptions();
-                renderDashboard();
-                renderInventoryList();
-                renderSalesTable();
-                lucide.createIcons();
-            });
-        };
-
-        async function syncToFirebase() {
-            try {
-                await setDoc(docRef, {
-                    bcvRate: state.bcvRate,
-                    products: state.products,
-                    sales: state.sales
-                });
-            } catch (e) {
-                console.error("Error al sincronizar con Firebase:", e);
-            }
-        }
-
-        // FORMATTING HELPERS
-        function formatNum(num) {
-            return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num || 0);
-        }
-
-        function formatUsd(num) {
-            return '$' + (num || 0).toFixed(2);
-        }
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = msg;
-            toastIcon.setAttribute('data-lucide', isError ? 'alert-circle' : 'check-circle');
-            toastIcon.className = `w-4 h-4 ${isError ? 'text-rose-400' : 'text-emerald-400'}`;
-            lucide.createIcons();
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        // BCV RATE MODAL LOGIC
-        window.openBcvModal = function() {
-            document.getElementById('inputBcvRate').value = state.bcvRate;
-            document.getElementById('bcvModal').classList.remove('hidden');
-        }
-
-        window.closeBcvModal = function() {
-            document.getElementById('bcvModal').classList.add('hidden');
-        }
-
-        window.saveBcvRate = async function() {
-            const val = parseFloat(document.getElementById('inputBcvRate').value);
-            if (val && val > 0) {
-                state.bcvRate = val;
-                await syncToFirebase();
-                closeBcvModal();
-                showToast('Tasa BCV actualizada en la nube.');
-            } else {
-                showToast('Por favor ingrese una tasa válida.', true);
-            }
-        }
-
-        // FORM INTERACTION & CALCULATION LOGIC
-        window.updateSaleFormOptions = function() {
-            const cupSelect = document.getElementById('cupSelect');
-            if (!cupSelect) return;
-            const cupKey = cupSelect.value;
-            const product = state.products[cupKey];
-            const promoBtn = document.getElementById('btnModePromo');
-
-            if (product && product.promoAvailable) {
-                promoBtn.disabled = false;
-                promoBtn.title = `Promoción: ${product.promoText}`;
-            } else if (promoBtn) {
-                promoBtn.disabled = true;
-                setSaleMode('normal');
-            }
-            calculateFormPrice();
-        }
-
-        window.setSaleMode = function(mode) {
-            state.currentMode = mode;
-            const btnNormal = document.getElementById('btnModeNormal');
-            const btnPromo = document.getElementById('btnModePromo');
-            const qtyLabel = document.getElementById('qtyLabel');
-
-            if (mode === 'normal') {
-                btnNormal.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 flex items-center justify-center gap-1.5 transition";
-                btnPromo.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center justify-center gap-1.5 transition disabled:opacity-50 disabled:cursor-not-allowed";
-                qtyLabel.innerText = "Cantidad de Vasos";
-            } else {
-                btnPromo.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-amber-600 bg-amber-50 text-amber-700 flex items-center justify-center gap-1.5 transition";
-                btnNormal.className = "py-2 px-3 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-500 flex items-center justify-center gap-1.5 transition";
-                qtyLabel.innerText = "Cantidad de Combos (2x)";
-            }
-            calculateFormPrice();
-        }
-
-        window.adjustQty = function(delta) {
-            const qtyInput = document.getElementById('saleQty');
-            let val = parseInt(qtyInput.value) || 1;
-            val = Math.max(1, val + delta);
-            qtyInput.value = val;
-            calculateFormPrice();
-        }
-
-        document.getElementById('saleQty')?.addEventListener('input', calculateFormPrice);
-
-        function calculateFormPrice() {
-            const cupSelect = document.getElementById('cupSelect');
-            const qtyInput = document.getElementById('saleQty');
-            if (!cupSelect || !qtyInput) return;
-
-            const cupKey = cupSelect.value;
-            const qty = parseInt(qtyInput.value) || 1;
-            const product = state.products[cupKey];
-
-            let unitPrice = product.price;
-            let totalPriceUsd = 0;
-
-            if (state.currentMode === 'promo' && product.promoAvailable) {
-                totalPriceUsd = qty * product.promoPrice;
-            } else {
-                totalPriceUsd = qty * unitPrice;
-            }
-
-            const totalPriceBs = totalPriceUsd * state.bcvRate;
-
-            document.getElementById('calculatedUsd').innerText = formatUsd(totalPriceUsd);
-            document.getElementById('calculatedBs').innerText = `${formatNum(totalPriceBs)} Bs`;
-        }
-
-        // SALES PROCESSORS
-        window.handleManualSale = async function(event) {
-            event.preventDefault();
-            const cupKey = document.getElementById('cupSelect').value;
-            const qtyMultiplier = parseInt(document.getElementById('saleQty').value) || 1;
-            const product = state.products[cupKey];
-
-            let cupsUsed = 0;
-            let totalUsd = 0;
-            let modeName = '';
-
-            if (state.currentMode === 'promo' && product.promoAvailable) {
-                cupsUsed = qtyMultiplier * product.promoQty;
-                totalUsd = qtyMultiplier * product.promoPrice;
-                modeName = `Promoción (${product.promoText})`;
-            } else {
-                cupsUsed = qtyMultiplier;
-                totalUsd = qtyMultiplier * product.price;
-                modeName = 'Individual';
-            }
-
-            if (product.stock < cupsUsed) {
-                showToast(`Stock insuficiente de ${product.name}. Disponibles: ${product.stock}`, true);
-                return;
-            }
-
-            await executeSale(cupKey, cupsUsed, totalUsd, modeName);
-
-            document.getElementById('saleQty').value = 1;
-            calculateFormPrice();
-        }
-
-        window.quickPromoSale = async function(cupKey, cupsQty, priceUsd, modeName) {
-            const product = state.products[cupKey];
-            if (product.stock < cupsQty) {
-                showToast(`Stock insuficiente de ${product.name} para la promoción.`, true);
-                return;
-            }
-
-            await executeSale(cupKey, cupsQty, priceUsd, modeName);
-        }
-
-        async function executeSale(cupKey, cupsUsed, totalUsd, modeName) {
-            const product = state.products[cupKey];
-            product.stock -= cupsUsed;
-
-            const totalCupCost = cupsUsed * product.cupCost;
-
-            const newSale = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-                cupKey: cupKey,
-                productName: product.name,
-                cupsUsed: cupsUsed,
-                mode: modeName,
-                totalUsd: totalUsd,
-                cupCostUsd: totalCupCost,
-                bcvRateAtSale: state.bcvRate
-            };
-
-            state.sales.unshift(newSale);
-
-            await syncToFirebase();
-            showToast(`Venta de ${product.name} registrada (-${cupsUsed} vasos).`);
-        }
-
-        window.deleteSale = async function(saleId) {
-            const saleIndex = state.sales.findIndex(s => s.id === saleId);
-            if (saleIndex > -1) {
-                const sale = state.sales[saleIndex];
-                
-                if (state.products[sale.cupKey]) {
-                    state.products[sale.cupKey].stock += sale.cupsUsed;
-                }
-
-                state.sales.splice(saleIndex, 1);
-                await syncToFirebase();
-                showToast('Transacción revertida e inventario restaurado.');
-            }
-        }
-
-        // DASHBOARD RENDERER
-        function renderDashboard() {
-            let totalUsd = 0;
-            let totalCostUsd = 0;
-            let totalCups = 0;
-
-            state.sales.forEach(s => {
-                totalUsd += s.totalUsd;
-                totalCostUsd += s.cupCostUsd;
-                totalCups += s.cupsUsed;
-            });
-
-            const netProfitUsd = totalUsd - totalCostUsd;
-
-            document.getElementById('metricTotalUsd').innerText = formatUsd(totalUsd);
-            document.getElementById('metricCostUsd').innerText = formatUsd(totalCostUsd);
-            document.getElementById('metricProfitUsd').innerText = formatUsd(netProfitUsd);
-            document.getElementById('metricCupsUsed').innerHTML = `${totalCups} <span class="text-sm font-normal text-slate-500">unid.</span>`;
-            document.getElementById('metricSalesCount').innerText = state.sales.length;
-
-            document.getElementById('metricTotalBs').innerText = `${formatNum(totalUsd * state.bcvRate)} Bs`;
-            document.getElementById('metricCostBs').innerText = `${formatNum(totalCostUsd * state.bcvRate)} Bs`;
-            document.getElementById('metricProfitBs').innerText = `${formatNum(netProfitUsd * state.bcvRate)} Bs`;
-        }
-
-        // INVENTORY LIST RENDERER
-        function renderInventoryList() {
-            const container = document.getElementById('inventoryList');
-            if (!container) return;
-            container.innerHTML = '';
-
-            Object.values(state.products).forEach(p => {
-                const isLow = p.stock <= 15;
-                const percent = Math.min(100, Math.max(0, (p.stock / 100) * 100));
-
-                const itemHtml = `
-                    <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold text-slate-800">${p.name}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-slate-500">Costo U: <b>${formatUsd(p.cupCost)}</b></span>
-                                <span class="px-2 py-0.5 font-bold rounded-md ${isLow ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}">
-                                    Stock: ${p.stock}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                            <div class="${isLow ? 'bg-rose-500' : 'bg-indigo-600'} h-1.5 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += itemHtml;
-            });
-        }
-
-        // SALES TABLE RENDERER
-        function renderSalesTable() {
-            const tbody = document.getElementById('salesTableBody');
-            const emptyState = document.getElementById('emptySalesState');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            if (state.sales.length === 0) {
-                emptyState?.classList.remove('hidden');
-            } else {
-                emptyState?.classList.add('hidden');
-            }
-
-            let footerUsdTotal = 0;
-            let footerBsTotal = 0;
-
-            state.sales.forEach(s => {
-                const totalBs = s.totalUsd * state.bcvRate;
-                footerUsdTotal += s.totalUsd;
-                footerBsTotal += totalBs;
-
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition";
-                row.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono text-slate-500">${s.timestamp}</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800">${s.productName}</td>
-                    <td class="py-2.5 px-3">
-                        <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold ${s.mode.includes('Promo') ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}">
-                            ${s.mode}
-                        </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center font-bold text-slate-700">${s.cupsUsed}</td>
-                    <td class="py-2.5 px-3 text-right font-bold text-slate-900">${formatUsd(s.totalUsd)}</td>
-                    <td class="py-2.5 px-3 text-right font-semibold text-emerald-700">${formatNum(totalBs)} Bs</td>
-                    <td class="py-2.5 px-3 text-center no-print">
-                        <button onclick="deleteSale(${s.id})" class="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition" title="Eliminar / Revertir Venta">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            document.getElementById('salesCountFooter').innerText = `${state.sales.length} transacción(es) realizada(s)`;
-            document.getElementById('footerUsd').innerText = formatUsd(footerUsdTotal);
-            document.getElementById('footerBs').innerText = `${formatNum(footerBsTotal)} Bs`;
-
-            lucide.createIcons();
-        }
-
-        // INVENTORY ADJUSTMENT MODAL
-        window.openInventoryModal = function() {
-            const container = document.getElementById('inventoryEditContainer');
-            container.innerHTML = '';
-
-            Object.values(state.products).forEach(p => {
-                const html = `
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-5">
-                            <span class="text-xs font-bold text-slate-800 block">${p.name}</span>
-                            <span class="text-[10px] text-slate-400">Precio Venta: ${formatUsd(p.price)}</span>
-                        </div>
-                        <div class="col-span-3">
-                            <label class="text-[10px] font-semibold text-slate-500 uppercase block">Stock</label>
-                            <input type="number" id="edit_stock_${p.id}" value="${p.stock}" min="0" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500">
-                        </div>
-                        <div class="col-span-4">
-                            <label class="text-[10px] font-semibold text-slate-500 uppercase block">Costo Vaso ($)</label>
-                            <input type="number" step="0.01" id="edit_cost_${p.id}" value="${p.cupCost}" min="0" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs font-bold text-slate-800 focus:ring-1 focus:ring-indigo-500">
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += html;
-            });
-
-            document.getElementById('inventoryModal').classList.remove('hidden');
-        }
-
-        window.closeInventoryModal = function() {
-            document.getElementById('inventoryModal').classList.add('hidden');
-        }
-
-        window.saveInventoryChanges = async function() {
-            Object.keys(state.products).forEach(id => {
-                const stockInput = document.getElementById(`edit_stock_${id}`);
-                const costInput = document.getElementById(`edit_cost_${id}`);
-                if (stockInput && costInput) {
-                    const newStock = parseInt(stockInput.value);
-                    const newCost = parseFloat(costInput.value);
-
-                    if (!isNaN(newStock) && newStock >= 0) state.products[id].stock = newStock;
-                    if (!isNaN(newCost) && newCost >= 0) state.products[id].cupCost = newCost;
-                }
-            });
-
-            await syncToFirebase();
-            closeInventoryModal();
-            showToast('Inventario y costos actualizados en la nube.');
-        }
-
-        // RESET DAY ACTION
-        window.confirmResetDay = async function() {
-            if (confirm('¿Estás seguro de cerrar el día? Se reiniciará el historial de ventas registradas hoy. (El stock actual se mantendrá).')) {
-                state.sales = [];
-                await syncToFirebase();
-                showToast('Día cerrado. Registro de ventas reiniciado.');
-            }
-        }
-
-        // EXPORT TO CSV
-        window.exportCSV = function() {
-            if (state.sales.length === 0) {
-                showToast('No hay datos de ventas para exportar.', true);
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Hora,Producto,Modalidad,Vasos Usados,Total USD,Tasa BCV,Total Bs\n";
-
-            state.sales.forEach(s => {
-                const totalBs = (s.totalUsd * state.bcvRate).toFixed(2);
-                csvContent += `"${s.timestamp}","${s.productName}","${s.mode}",${s.cupsUsed},${s.totalUsd.toFixed(2)},${state.bcvRate},${totalBs}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `reporte_ventas_vasos_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // PRINT REPORT
-        window.printReport = function() {
-            document.getElementById('printDate').innerText = `Fecha de emisión: ${new Date().toLocaleDateString('es-VE')} - ${new Date().toLocaleTimeString()}`;
-            document.getElementById('printBcv').innerText = `${formatNum(state.bcvRate)} Bs/USD`;
-            window.print();
-        }
-    </script>
-</body>
-</html>
